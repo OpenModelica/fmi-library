@@ -194,6 +194,30 @@ if(FMILIB_SYSTEM_EXPAT)
     # And the following target:
     #   - expat
     find_package(EXPAT REQUIRED)
+elseif(FMILIB_EXPAT_AS_SUBPROJECT)
+    # OpenModelica: build the bundled Expat as a normal subdirectory instead of an
+    # ExternalProject. ExternalProject does not inherit the toolchain and flags of the
+    # outer build, and it only leaves behind an imported target, which cannot be used
+    # by targets outside of this directory. The rest of the OpenModelica build links
+    # against expat, so it has to be a real target.
+    set(FMIXML_EXPAT_DIR "${FMILIB_THIRDPARTYLIBS}/Expat/expat-2.6.4")
+
+    set(EXPAT_BUILD_TOOLS OFF CACHE BOOL "Build the xmlwf tool for expat library")
+    set(EXPAT_BUILD_EXAMPLES OFF CACHE BOOL "Build the examples for expat library")
+    set(EXPAT_BUILD_TESTS OFF CACHE BOOL "Build the tests for expat library")
+    set(EXPAT_BUILD_DOCS OFF CACHE BOOL "Build man page for xmlwf")
+    set(EXPAT_BUILD_PKGCONFIG OFF CACHE BOOL "Build pkg-config file")
+    set(EXPAT_SHARED_LIBS OFF CACHE BOOL "Build a shared expat library")
+    set(EXPAT_ENABLE_INSTALL OFF CACHE BOOL "Install expat files in cmake install target")
+    set(EXPAT_DTD OFF CACHE BOOL "Define to make parameter entity parsing functionality available")
+    set(EXPAT_NS OFF CACHE BOOL "Define to make XML Namespaces functionality available")
+    if(MSVC)
+        set(EXPAT_MSVC_STATIC_CRT ${FMILIB_BUILD_WITH_STATIC_RTLIB} CACHE BOOL "Use /MT flag (static CRT) when compiling in MSVC")
+    endif()
+
+    add_subdirectory(${FMIXML_EXPAT_DIR} ${CMAKE_BINARY_DIR}/ExpatEx)
+
+    set(EXPAT_INCLUDE_DIRS ${FMIXML_EXPAT_DIR}/lib)
 else()
     include(ExternalProject)
 
