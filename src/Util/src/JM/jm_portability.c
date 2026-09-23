@@ -203,10 +203,11 @@ jm_status_enu_t jm_rmdir(jm_callbacks* cb, const char* dir) {
 
         cb = jm_get_default_callbacks();
     }
+    /* OpenModelica: the directory is quoted so that paths containing spaces work. */
 #ifdef WIN32
-    const char* fmt_cmd = "rmdir /s /q %s";
+    const char* fmt_cmd = "rmdir /s /q \"%s\"";
 #else
-    const char* fmt_cmd = "rm -rf %s";
+    const char* fmt_cmd = "rm -rf \"%s\"";
 #endif
     char * buf = (char*)cb->calloc(sizeof(char), strlen(dir)+strlen(fmt_cmd)+1);
     if(!buf) {
@@ -216,7 +217,9 @@ jm_status_enu_t jm_rmdir(jm_callbacks* cb, const char* dir) {
     sprintf(buf, fmt_cmd, dir);/*safe*/
 #ifdef WIN32
     {
-        char* ch = buf+strlen(fmt_cmd) - 2;
+        /* Only the directory may have its separators converted, not the command flags.
+           The directory starts right after the opening quote. */
+        char* ch = strchr(buf, '"') + 1;
         while(*ch) {
             if(*ch == '/') *ch = '\\';
             ch++;
