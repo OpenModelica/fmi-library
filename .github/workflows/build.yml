@@ -36,6 +36,24 @@ jobs:
       - name: Test external
         run: ctest --test-dir build_external --output-on-failure
 
+  enterprise-linux:
+    runs-on: ubuntu-latest
+    container: almalinux:10
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system
+        run: |
+          dnf install -y epel-release
+          dnf config-manager --set-enabled crb
+          dnf install -y cmake gcc-c++ make zlib-ng-compat-devel expat-devel minizip-ng-compat-devel
+      - name: Build external
+        run: |
+          cmake -DCMAKE_INSTALL_PREFIX=~/.local -DFMILIB_GENERATE_DOXYGEN_DOC=0 -DFMILIB_EXTERNAL_LIBS=ON -DFMILIB_BUILD_STATIC_LIB=OFF -B build_external .
+          cmake --build build_external --target install --parallel 4
+      - name: Test external
+        run: ctest --test-dir build_external --output-on-failure
+
   windows:
     runs-on: windows-latest
     timeout-minutes: 10

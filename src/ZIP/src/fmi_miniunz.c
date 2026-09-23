@@ -62,6 +62,8 @@
 #endif
 
 
+/* minizip-ng's compat headers do not include zlib.h, which provides uLong, uInt and the Z_* constants. */
+#include <zlib.h>
 #include "unzip.h"
 
 #define CASESENSITIVITY (0)
