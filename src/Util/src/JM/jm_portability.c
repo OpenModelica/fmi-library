@@ -51,6 +51,10 @@ static const char * module = "JMPRT";
 jm_portability_loadlibrary_flag_t jm_portability_get_load_dll_handle_default_flag() {
 #ifdef WIN32
     return 0;
+#elif defined(RTLD_DEEPBIND)
+    /* OpenModelica: the loaded FMU must resolve its own symbols first, so that
+       it does not pick up symbols of the same name from the host process. */
+    return RTLD_NOW|RTLD_LOCAL|RTLD_DEEPBIND;
 #else
     return RTLD_NOW|RTLD_LOCAL;
 #endif
