@@ -277,7 +277,9 @@ set(FMILIB_SHARED_SUBLIBS fmixml fmizip fmicapi)
 if(NOT FMILIB_SYSTEM_MINIZIP)
     list(APPEND FMILIB_SHARED_SUBLIBS minizip)
 endif()
-if(NOT FMILIB_SYSTEM_ZLIB)
+if(NOT FMILIB_SYSTEM_ZLIB AND NOT FMILIB_EXTERNAL_ZLIB_TARGET)
+    # FMILIB_EXTERNAL_ZLIB_TARGET: zlib is built by the surrounding project, so it is
+    # linked in by that project and must not be merged into fmilib as well.
     list(APPEND FMILIB_SHARED_SUBLIBS zlib)
 endif()
 if(NOT FMILIB_SYSTEM_EXPAT)

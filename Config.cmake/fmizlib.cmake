@@ -11,7 +11,36 @@
 #    You should have received a copy of the FMILIB_License.txt file
 #    along with this program. If not, contact Modelon AB <http://www.modelon.com>.
 
-if(FMILIB_SYSTEM_ZLIB)
+if(TARGET zlib)
+
+    # OpenModelica: the surrounding build (OMCompiler/3rdParty/zlib) has already created
+    # a 'zlib' target. Use it instead of building a second copy of zlib, which would both
+    # clash on the target name and give the process two copies of the same symbols.
+    set(FMILIB_EXTERNAL_ZLIB_TARGET TRUE)
+    # The minizip sources are still taken from the bundled zlib, only the library
+    # itself and its headers come from the surrounding project.
+    set(ZLIB_SOURCE_DIR "${FMILIB_THIRDPARTYLIBS}/Zlib/zlib-1.3.1")
+    get_target_property(ZLIB_INCLUDE_DIRS zlib INTERFACE_INCLUDE_DIRECTORIES)
+    if(NOT ZLIB_INCLUDE_DIRS)
+        message(FATAL_ERROR "The existing 'zlib' target has no INTERFACE_INCLUDE_DIRECTORIES.")
+    endif()
+
+elseif(OMC_ZLIB_LIBRARY)
+
+    # OpenModelica: the autotools build configures FMIL as a standalone project and points
+    # it at the zlib that OpenModelica has already built (see OMCompiler/Makefile.common).
+    set(FMILIB_EXTERNAL_ZLIB_TARGET TRUE)
+    set(ZLIB_SOURCE_DIR "${FMILIB_THIRDPARTYLIBS}/Zlib/zlib-1.3.1")
+    set(ZLIB_INCLUDE_DIRS "${OMC_ZLIB_INCLUDE_DIR}")
+
+    add_library(zlib STATIC IMPORTED)
+    set_target_properties(
+        zlib PROPERTIES
+        IMPORTED_LOCATION "${OMC_ZLIB_LIBRARY}"
+        INCLUDE_DIRECTORIES "${ZLIB_INCLUDE_DIRS}"
+    )
+
+elseif(FMILIB_SYSTEM_ZLIB)
 
     include(FindZLIB)
 
