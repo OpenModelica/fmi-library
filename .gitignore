@@ -18,3 +18,5 @@
 /Test/test_installation/build
 
 /ThirdParty/winflexbison/
+# Top level include/ directory assembled by the OpenModelica build
+/include/
